@@ -1,0 +1,245 @@
+class LinearSystemSolver:
+    def matinA(self,m,n):
+        from numpy import zeros,array
+        A_=zeros((m,n),float)
+        for i in range(m):
+            for j in range(n):
+                A_[i,j]=float(input('enter value at A['+str(i+1)+']['+str(j+1)+']  '))
+        return A_
+    def matinb(self,m):
+        from numpy import zeros,array
+        b_=zeros((m),int)
+        for i in range(m):
+            b_[i]=int(input('enter value at b['+str(i+1)+']  '))
+        return b_
+    def concat(self,m,n,A,b):
+        from numpy import zeros,array
+        C_=zeros((m,n+1),float)
+        for i in range(m):
+            for j in range(n):
+                C_[i,j]=A[i,j]
+        for i in range(m):
+            C_[i,n]=b[i]
+        return C_
+    def bsubs(m,n,C):
+        x_=zeros((m),float)
+        for i in range(m-1,-1,-1):
+            x_[i]=C[i,n]
+            for j in range(i+1,n):
+                x_[i]-=C[i,j]*x_[j]
+            x_[i]=x_[i]/C[i,i]
+        return x_
+    def pivot(m,n,C):
+        for i in range(0,n):
+            if C[i,i]==0:
+                for j in range(i+1,m):
+                    if C[j,i]!=0:
+                        temp_rw=C[i].copy()
+                        C[i],C[j]=C[j],temp_rw
+        return(C)
+    def solve(self,method):
+
+        if method=='gauss':
+
+            m,n=int(input('row ')),int(input('column'))
+            A=self.matinA(m,n)
+            b=self.matinb(m)
+            C=self.concat(m,n,A,b)
+            C=self.pivot(m,n,C)
+
+            for k in range(i+1,m):
+                r=C[k,i]/C[i,i]
+                if r!=0:
+                    for d  in range(0,n+1):
+                        C[k,d]-=r*C[i,d]
+
+                x=self.bsubs(m,n,C)
+                return(x)
+
+        if method=='gauss-jordan':
+
+            m,n=int(input('row ')),int(input('column'))
+            A=self.matinA(m,n)
+            b=self.matinb(m)
+            C=self.concat(m,n,A,b)
+            C=self.pivot(m,n,C)
+
+            for i in range(0,n):
+                for k in range(0,n):
+                    if k!=i:
+                        r=C[k,i]/C[i,i]
+                        if r!=0:
+                            for d  in range(0,n+1):
+                                C[k,d]-=r*C[i,d]
+
+            x=self.bsubs(m,n,C)
+            return(x)
+
+
+        elif method =='gauss-siedel':
+
+            import numpy as np
+            n=int(input('order'))
+            A=self.matinA(n,n)
+            b=self.matinb(n)
+            eps,D,L,U=np.zeros(n),np.zeros(n),np.zeros(n),np.zeros(n)
+            for i in range(n) :
+                eps[i]=.0000001                  #value for epsilon
+            lmt=20                                     #iteration limit
+
+            for i in range(n):
+                for j in range(n):
+                    if i==j:
+                        D[i,j]=A[i,j]
+                    elif i>j:
+                        L[i,j]=A[i,j]
+            U=A-L-D
+
+            for i in range(lmt):
+                if np.greater(abs(np.dot(A,x)-b),eps).any():
+                    q=- (np.dot(np.linalg.inv(L+D), b + np.dot(U, x)))
+                    x=q
+                else:
+                    break
+            return(x)
+
+        else:
+            return NULL
+            class PolynomialSolver(object):
+    def BisectionSearch(self, order, coefficients, low, high, epsilon):
+        num = 0
+        while (high-low)>=epsilon and num<500:
+            mid = (low+high)/2
+            if f(coefficients, low)*f(coefficients, mid) > 0:
+                low = mid
+            else:
+                high = mid
+            num += 1
+        return mid
+
+    def Secant(self, order, coefficients, low, high, epsilon):
+        num, x0, x1, x2 = 0, 1, 2, 3
+        while abs(f(order, coefficients, x1))>=epsilon and num<500:
+            x2, x1, x0 = (x1 - ((x1-x0)*f(order, coefficients, x1))/(f(order, coefficients, x1)-f(order, coefficients, x0))), x2, x1
+            num += 1
+        return x1
+
+    def secantRF(self, order, coefficients, epsilon):
+    num, x0, x1, x2 = 0, 1, 2, 8
+    while abs(f(order, coefficients, x1))>=epsilon and num<500:
+        x2, x1, x0 = (x1 - ((x1-x0)*f(order, coefficients, x1))/(f(order, coefficients, x1)-f(order, coefficients, x0))), x2, x1
+        while f(order, coefficients, x2)*f(order, coefficients, x1) > 0:
+            x2, x1, x0 = (x1 - ((x1-x0)*f(order, coefficients, x1))/(f(order, coefficients, x1)-f(order, coefficients, x0))), x2, x1
+        num += 1
+    return x1
+    
+    def NewtonRaphson(self, order, coefficients, low, high, epsilon):
+        num, x0, x1 = 0, low, high
+        while abs(f(order, coefficients, x0))>=epsilon and num<500:
+            x1, x0 = (x0 - (f(order, coefficients, x0)/diff(order, coefficients, x0))), x1
+            num += 1
+        return x0
+
+    def solve(self, order, coefficients, method, low, high, epsilon = 1e-6):
+        if method == 'bisection':
+            return self.BisectionSearch(order, coefficients, low, high, epsilon)
+        elif method == 'secant':
+            return self.Secant(order, coefficients, low, high, epsilon)
+        elif method == 'secantrf':
+            return self.SecantRF(order, coefficients, low, high, epsilon)
+        elif method == 'newtonraphson':
+            return self.NewtonRaphson(order, coefficients, low, high, epsilon)
+
+
+#Newton's method not done
+class Interpolate:
+    
+    def solve(self,L,M,method):
+        if(method=="newton"):
+            return (self.Newton(L,M))
+        else:
+            return (self.Lagrange(L,M))
+
+    def Lagrange(self,L,M):                                                
+       
+        
+        from numpy import array
+        from numpy.polynomial import polynomial as P
+        n=len(L)                                                           
+        w=(-1*L[0],1)                                                      
+        for i in range(1,n):
+            w=P.polymul(w,(-1*L[i],1))                                    
+        result=array([0.0 for i in range(len(w)-1)])                    
+        derivative=P.polyder(w)                                             
+        for i in range(n):
+            result+=(P.polydiv(w,(-1*L[i],1))[0]*M[i])/P.polyval(L[i],derivative)   
+        return(list(result))                                                
+    def Newton(self,L,M):                                                   
+       
+        
+        from numpy import array
+        from numpy.polynomial import polynomial as P
+        n=len(L)                                                            
+        mat=[[0.0 for i in range(n)] for j in range(n)]                    
+        for i in range(n):                                                 
+            mat[i][0]=M[i]
+        for i in range(1,n):                                               
+            for j in range(n-i):
+                mat[j][i]=(mat[j+1][i-1]-mat[j][i-1])/(L[j+i]-L[j])
+        result=array((mat[0][0],))                                          
+        for i in range(1,n):
+            prod=(-1*L[0],1)                                               
+                                                                            
+            for j in range(1,i):
+                prod=P.polymul(prod,(-1*L[j],1))                              
+            result=P.polyadd(result,array(prod)*mat[0][i])                  
+        return (list(result))                                               
+
+apx=Interpolate()                                                          
+for method in ["newton","lagrange"]:
+    solution=apx.solve([1,2,3],[0,-1,0],method)
+    print(solution)
+    class Integrate:
+	def solve(self,order,coeffs,method):
+		def f(x):
+			sum=0
+			for i in range(order+1):
+				sum+=(coeffs[i]*(x**(order-i)))
+			return sum
+		if method=='trapezoid':
+			a=float(input('enter the lower limit of interval: '))
+			b=float(input('enter the upper limit of interval: '))
+			n=int((b-a)/0.0005)
+			x_values=[a]
+			for i in range(1,n):
+				x_values.append(float(str(x_values[0]+(0.001*i))[:5]))
+			x_values.append(b)
+			def trapezoid_solution(f,x_values,n):
+				sum=0
+				for i in range(1,n):
+					sum+=f(x_values[i])
+				sum*=2
+				sum+=(f(x_values[0])+f(x_values[n]))
+				ans=((x_values[n]-x_values[0])*sum)/(2*n)
+				return ans
+			return trapezoid_solution(f,x_values,n)
+		elif method=='simpson':
+			a=float(input('enter the lower limit of interval: '))
+			b=float(input('enter the upper limit of interval: '))
+			n=int((b-a)/0.0005)
+			x_values=[a]
+			for i in range(1,n):
+				x_values.append(float(str(x_values[0]+(0.0005*i)[:5]))
+			x_values.append(b)
+			def simpson_solution(f,x_values,n):
+				sum1,sum2,sum=0,0,0
+				for i in range(1,n,2):
+					sum1+=f(x_values[i])
+				sum1*=4
+				for i in range(2,n,2):
+					sum2+=f(x_values[i])
+				sum2*=2
+				sum+=(f(x_values[0])+f(x_values[n])+sum1+sum2)
+				ans=((x_values[n]-x_values[0])*sum)/(3*n)
+				return ans
+			return simpson_solution(f,x_values,n)
